@@ -1,0 +1,22 @@
+config:
+  name: __MSNAME__-config
+  data:
+    # Configuration values can be set as key-value properties
+    LOG_LEVEL: info
+    WS_TIMEOUT: '360'
+    AWS_REGION: us-west-2
+    MONGO_CONNECT_TIMEOUT: '100000' # Specifies the maximum time, in milliseconds, 
+    # that the driver is allowed to wait for establishing a connection to the 
+    MONGO_MAX_POOL_SIZE: '10'
+    MONGO_MIN_POOL_SIZE: '5'
+    MONGO_SERVER_SELECTION_TIMEOUT: '30000' # Specifies the maximum time, in milliseconds, to wait for the MongoDB server to be selected.
+    MONGO_MAX_ID_LETIME: '300000' # Specifies the maximum amount of time that a connection can remain idle in the pool before being removed and closed.
+    MONGO_URI: 'mongodb+srv://corentsu-dev-pl-0.s5axe.mongodb.net'
+    MONGO_DATABASE_NAME: 'ciclos-oscor-orders'
+
+secret:
+  name: __MSNAME__-secret
+  data:
+    # Values must be encoded as base64 (for example: echo -n 'SOME_SECRET' | base64)
+    MONGO_USERNAME: #{MONGO_USERNAME}#
+    MONGO_PASSWORD: #{MONGO_PASSWORD}#

@@ -1,0 +1,51 @@
+name: Slack Deployment Notifications
+on:
+  pull_request:
+    types: [closed]
+    branches: [production]
+  workflow_dispatch:
+
+jobs:
+  slack_notifications:
+    runs-on: ubuntu-latest
+    environment:
+      name: Slack Channel <#github-deploy-notifications>
+      url: https://app.slack.com/client/T0125MCPZEE/C05FM3BJVTL
+    if: github.event.pull_request.merged == true
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Send custom JSON data to Slack workflow
+      uses: slackapi/slack-github-action@v1.24.0
+      with:
+        channel-id: 'C05FM3BJVTL'
+        payload: |
+          {
+            "text": "Se ha realizado un paso a producción del siguiente servicio: ${{ github.event.repository.name }} en el entorno de producción. Ejecutor: ${{ github.actor }}. Ver detalles: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Ir a la ejecución del action>",
+            "blocks": [
+              {
+                "type": "header",
+                "text": {
+                  "type": "plain_text",
+                  "text": "Paso a producción"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": ":blue: Se ha realizado un paso a producción del siguiente servicio:\n*Servicio:* ${{ github.event.repository.name }}\n*Entorno:* Producción\n*Ejecutor:* ${{ github.actor }}"
+                }
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*URL:* <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}|Ir a la ejecución del action>\n---"
+                }
+              }
+            ]
+          }
+      env:
+        SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
