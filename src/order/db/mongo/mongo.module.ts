@@ -3,8 +3,8 @@ import { Logger, Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { Order, OrderSchema } from './../.././schemas/order.schema';
 import { MongoService } from './config/mongoose.config';
-import { OrderService } from './../../order.service';
-import { OrderRepository } from './../../order.repository';
+import { OrderService } from '../../emission.service';
+import { OrderRepository } from '../../emission.repository';
 
 @Module({
   imports: [

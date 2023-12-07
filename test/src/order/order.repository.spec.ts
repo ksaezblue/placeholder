@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Order } from '../../../src/order/schemas/order.schema'
-import { OrderRepository } from '../../../src/order/order.repository';
+import { OrderRepository } from '../../../src/order/emission.repository';
 
 describe('OrderRepository', () => {
   let orderRepository: OrderRepository;

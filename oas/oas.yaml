@@ -1,154 +1,622 @@
-openapi: 3.0.0
+openapi: 3.0.1
+info:
+  title: API Emission Orders
+  description: API for the emission the a Order
+  contact:
+    name: Ciclo de Vida de la OS
+    email: andres.godoy@blue.cl
+  version: 1.0.0
+servers:
+  - url: >-
+      http://bx-srv-ciclos-orders-emission.{enviroment}-ns-corentsu-ciclos{basePath}
+    variables:
+      enviroment:
+        enum:
+          - dev
+          - qa
+          - prod
+        default: dev
+      basePath:
+        default: /ciclos/orders/v1
+tags:
+  - name: emission
+    description: Emission Controller
 paths:
-  /api/ciclos/consultas-orden/v1:
+  /{orderId}/validate:
     get:
-      operationId: AppController_getHello
-      parameters: []
-      responses:
-        "200":
-          description: ""
-      summary: "Get de hola mundo en read-only"
-  /api/ciclos/consultas-orden/v1/orders/{orderId}:
-    get:
-      operationId: OrderController_findOne
+      tags:
+        - emission
+      operationId: emissionController_getValidate
+      summary: Validate if the OrderId is available for a new Emission
       parameters:
         - name: orderId
-          required: true
           in: path
+          description: Enter the order number (9-10 digits)
+          required: true
           schema:
-            type: string
+            type: integer
+            minimum: 9
+            maximum: 10
       responses:
-        "200":
-          description: ""
-      summary: "Get de orders en read-only"
-  /api/ciclos/consultas-orden/v1/health/liveness:
-    get:
-      operationId: HealthController_liveness
-      parameters: []
-      summary: "Get de healthcheck"
+        '200':
+          $ref: '#/components/responses/Validate'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServer'
+  /{orderId}/activate:
+    put:
+      tags:
+        - emission
+      operationId: emissionController_postActivate
+      summary: Activate Emission the a Order
+      parameters:
+        - name: orderId
+          in: path
+          description: Enter the order number (9-10 digits)
+          required: true
+          schema:
+            type: integer
+            minimum: 9
+            maximum: 10
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activate'
+        required: true
       responses:
-        "200":
-          description: ""
-  /api/ciclos/consultas-orden/v1/health/readiness:
-    get:
-      operationId: HealthController_check
-      parameters: []
-      summary: "Get de readiness"
+        '201':
+          $ref: '#/components/responses/Response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServer'
+  /emission:
+    post:
+      tags:
+        - emission
+      operationId: emissionController_postEmission
+      summary: Create New Emission the a Order
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Emission'
+        required: true
       responses:
-        "200":
-          description: The Health Check is successful
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: ok
-                  info:
-                    type: object
-                    example: &a1
-                      database: &a2
-                        status: up
-                    additionalProperties:
-                      type: object
-                      properties:
-                        status:
-                          type: string
-                      additionalProperties:
-                        type: string
-                    nullable: true
-                  error:
-                    type: object
-                    example: {}
-                    additionalProperties:
-                      type: object
-                      properties:
-                        status:
-                          type: string
-                      additionalProperties:
-                        type: string
-                    nullable: true
-                  details:
-                    type: object
-                    example: *a1
-                    additionalProperties:
-                      type: object
-                      properties:
-                        status:
-                          type: string
-                      additionalProperties:
-                        type: string
-        "503":
-          description: The Health Check is not successful
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: error
-                  info:
-                    type: object
-                    example: *a1
-                    additionalProperties:
-                      type: object
-                      properties:
-                        status:
-                          type: string
-                      additionalProperties:
-                        type: string
-                    nullable: true
-                  error:
-                    type: object
-                    example:
-                      redis: &a3
-                        status: down
-                        message: Could not connect
-                    additionalProperties:
-                      type: object
-                      properties:
-                        status:
-                          type: string
-                      additionalProperties:
-                        type: string
-                    nullable: true
-                  details:
-                    type: object
-                    example:
-                      database: *a2
-                      redis: *a3
-                    additionalProperties:
-                      type: object
-                      properties:
-                        status:
-                          type: string
-                      additionalProperties:
-                        type: string
-info:
-  title: API
-  description: API Description
-  version: 0.0.1
-  contact: {}
-  license:
-    name: Blue Express
-    url: https://www.blue.cl
-tags: []
-servers:
-  - url: http://localhost:3000
-    description: Local Environment
-  - url: https://devapigw.bluex.cl
-    description: Development Environment
-  - url: https://qaapigw.bluex.cl
-    description: QA - Environment
-  - url: https://apigw.bluex.cl
-    description: Production Environment
+        '201':
+          $ref: '#/components/responses/Response'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServer'
 components:
+  schemas:
+    Emission:
+      required:
+        - emissionDate
+        - service
+        - channel
+        - isDangerousShipping
+        - creationUser
+        - seller
+        - buyer
+        - shipper
+        - pickup
+        - delivery
+        - package
+      type: object
+      properties:
+        emissionDate:
+          type: string
+        service:
+          type: string
+        channel:
+          type: string
+        isDangerousShipping:
+          type: boolean
+        creationUser:
+          type: string
+        observation:
+          type: string
+        references:
+          type: array
+          items:
+            type: string
+        declaredValue:
+          type: number
+        seller:
+          type: object
+          $ref: '#/components/schemas/Seller'
+        buyer:
+          type: object
+          $ref: '#/components/schemas/Buyer'
+        shipper:
+          type: object
+          $ref: '#/components/schemas/Shipper'
+        shipping:
+          type: object
+          $ref: '#/components/schemas/Shipping'
+        pickup:
+          type: object
+          $ref: '#/components/schemas/Address'
+        delivery:
+          type: object
+          $ref: '#/components/schemas/Address'
+        complementary:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplementaryServices'
+        packages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Package'
+      example:
+        emissionDate: '2023-12-06T15:30:00Z'
+        service: Standard
+        channel: WEB
+        isDangerousShipping: false
+        creationUser: rod.grille
+        observation: This is a sample emission
+        references:
+          - 1335485d4
+          - 23va332e2
+        declaredValue: 100.5
+        seller:
+          account: 78959482-12-8
+          name: Seller Company
+          identifier: 12345678-9
+          phone: '912345678'
+          email: seller@example.com
+        buyer:
+          name: John Dwayne
+          identifier: 987654321-9
+          phone: '+5698654321'
+          email: buyer@example.com
+        shipper:
+          account: 80548613-1-80
+          name: Shippers
+        pickup:
+          street: 123 Main St
+          number: 456
+          commune: Central Commune
+          city: Cityville
+          region: Regionville
+          geolocalization:
+            - 40.7128
+            - -74.006
+          complement: Near the park
+          agency: 789
+        delivery:
+          street: 456 Side St
+          number: 789
+          commune: South Commune
+          city: Cityville
+          region: Regionville
+          geolocalization:
+            - 40.7128
+            - -74.006
+          complement: Across the street
+          agency: 1011
+        shipping:
+          paymentType: PP
+          tariffPlan: A32
+          shippingCost: 1300
+          freight: 1053
+          discount: 200
+          tax: 247
+          payment:
+            - method: TD
+              date: '2023-12-10'
+              currency: CLP
+              amount: 1300
+              transactionId: 123456789
+        complementary:
+          - serviceType: COD
+            identifier: ABC123
+            documentType: B
+            amount: 2000
+            collection:
+              - method: TD
+                date: '2023-12-15'
+                amount: 2000
+                transactionId: XYZ789
+        packages:
+          - size: M
+            inspection: null
+            height: 10
+            length: 20
+            width: 15
+            weight: 25
+            units:
+              length: CM
+              width: KG
+    Activate:
+      required:
+        - emissionDate
+        - service
+        - channel
+        - isDangerousShipping
+        - creationUser
+        - seller
+        - buyer
+        - pickup
+        - delivery
+      type: object
+      properties:
+        emissionDate:
+          type: string
+        service:
+          type: string
+        channel:
+          type: string
+        isDangerousShipping:
+          type: boolean
+        creationUser:
+          type: string
+        observation:
+          type: string
+        references:
+          type: array
+          items:
+            type: string
+        declaredValue:
+          type: number
+        seller:
+          type: object
+          $ref: '#/components/schemas/Seller'
+        buyer:
+          type: object
+          $ref: '#/components/schemas/Buyer'
+        shipping:
+          type: object
+          $ref: '#/components/schemas/Shipping'
+        pickup:
+          type: object
+          $ref: '#/components/schemas/Address'
+        delivery:
+          type: object
+          $ref: '#/components/schemas/Address'
+        complementary:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplementaryServices'
+        packages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Package'
+      example:
+        emissionDate: '2023-12-06T15:30:00Z'
+        service: Standard
+        channel: WEB
+        isDangerousShipping: false
+        creationUser: rodrigo.grille
+        observation: This is a sample emission
+        references:
+          - 1335485d4
+          - 23va332e2
+        declaredValue: 100.5
+        seller:
+          account: 78959482-12-8
+          name: Seller Company
+          identifier: 12345678-9
+          phone: '912345678'
+          email: seller@example.com
+        buyer:
+          name: John Dwayne
+          identifier: 987654321-9
+          phone: '+5698654321'
+          email: buyer@example.com
+        pickup:
+          street: 123 Main St
+          number: 456
+          commune: Central Commune
+          city: Cityville
+          region: Regionville
+          geolocalization:
+            - 40.7128
+            - -74.006
+          complement: Near the park
+          agency: 789
+        delivery:
+          street: 456 Side St
+          number: 789
+          commune: South Commune
+          city: Cityville
+          region: Regionville
+          geolocalization:
+            - 40.7128
+            - -74.006
+          complement: Across the street
+          agency: 1011
+        shipping:
+          paymentType: PP
+          tariffPlan: A32
+          shippingCost: 1300
+          freight: 1053
+          discount: 200
+          tax: 247
+          payment:
+            - method: TD
+              date: '2023-12-10'
+              currency: CLP
+              amount: 1300
+              transactionId: 123456789
+        complementary:
+          - serviceType: COD
+            identifier: ABC123
+            documentType: B
+            amount: 2000
+            collection:
+              - method: TD
+                date: '2023-12-15'
+                amount: 2000
+                transactionId: XYZ789
+        packages:
+          - size: M
+            inspection: null
+            height: 10
+            length: 20
+            width: 15
+            weight: 25
+            units:
+              length: CM
+              width: KG
+    Seller:
+      type: object
+      required:
+        - account
+        - name
+        - phone
+        - email
+      properties:
+        account:
+          type: string
+        name:
+          type: string
+        identifier:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+    Buyer:
+      type: object
+      required:
+        - name
+        - phone
+        - email
+      properties:
+        name:
+          type: string
+        identifier:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+    Shipper:
+      type: object
+      required:
+        - account
+      properties:
+        account:
+          type: string
+        name:
+          type: string
+    Shipping:
+      type: object
+      properties:
+        paymentType:
+          type: string
+        tariffPlan:
+          type: string
+        shippingCost:
+          type: number
+        freight:
+          type: number
+        discount:
+          type: number
+        tax:
+          type: number
+        payment:
+          type: array
+          items:
+            $ref: '#/components/schemas/Payment'
+    Address:
+      type: object
+      required:
+        - street
+        - number
+        - commune
+        - region
+      properties:
+        street:
+          type: string
+        number:
+          type: integer
+        commune:
+          type: string
+        city:
+          type: string
+        region:
+          type: string
+        location:
+          type: string
+        geolocalization:
+          type: object
+          $ref: '#/components/schemas/Geo'
+        complement:
+          type: string
+        agency:
+          type: integer
+    Payment:
+      type: object
+      properties:
+        method:
+          type: string
+        date:
+          type: string
+        currency:
+          type: string
+        amount:
+          type: number
+        transactionId:
+          type: number
+    ComplementaryServices:
+      type: object
+      properties:
+        serviceType:
+          type: string
+        identifier:
+          type: string
+        documentType:
+          type: string
+        amount:
+          type: number
+        collection:
+          type: array
+          items:
+            $ref: '#/components/schemas/Collection'
+    Collection:
+      type: object
+      properties:
+        method:
+          type: string
+        date:
+          type: string
+        amount:
+          type: number
+        transactionId:
+          type: string
+        currency:
+          type: string
+    Package:
+      type: object
+      required:
+        - inspection
+      properties:
+        size:
+          type: string
+        inspection:
+          type: object
+          $ref: '#/components/schemas/Inspection'
+    Inspection:
+      type: object
+      properties:
+        height:
+          type: number
+        length:
+          type: number
+        width:
+          type: number
+        weight:
+          type: number
+        units:
+          type: object
+          $ref: '#/components/schemas/Units'
+    Units:
+      type: object
+      properties:
+        length:
+          type: string
+        width:
+          type: string
+    Geo:
+      type: array
+      maxItems: 2
+      minItems: 2
+      items:
+        type: number
+        format: double
+        minimum: -180
+        maximum: 180
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+  responses:
+    Response:
+      description: Emission Succedfull
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              orderId:
+                type: string
+              message:
+                type: string
+          example:
+            orderId: 6610670614
+            message: Orden de servicio emitida correctamente
+    Validate:
+      description: Validate Order
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              orderId:
+                type: string
+              size:
+                type: string
+                enum:
+                  - S
+                  - M
+                  - L
+                  - XL
+              message:
+                type: string
+          example:
+            orderId: '6610670614'
+            size: S
+            message: Orden de servicio disponible
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: La Orden no tiene el formato correcto
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          examples:
+            sample 1:
+              value:
+                message: Orden de servicio no disponible para la emisión
+            sample 2:
+              value:
+                message: No es posible acceder al recurso
+    InternalServer:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            message: No se pudo ejecutar la operación
   securitySchemes:
-    basic:
-      type: http
-      scheme: basic
-  schemas: {}
+    Blue-OAuth2:
+      flows: {}
+      type: oauth2
+      description: Blue-OAuth2
+    Blue-APIKey:
+      type: apiKey
+      description: Blue-APIKey
+      name: apikey
+      in: header
 security:
-  - basic: []
+  - Blue-OAuth2: []
+  - Blue-APIKey: []

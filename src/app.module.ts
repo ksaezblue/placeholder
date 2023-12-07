@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { OrderModule } from './order/order.module';
+import { OrderModule } from './order/emission.module';
 import { AppService } from './app.service';
 import { AppController } from './app.controller';
 import { HealthModule } from './health/health.module';
