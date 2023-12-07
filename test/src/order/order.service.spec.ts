@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getModelToken } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { OrderService } from '../../../src/order/order.service';
+import { OrderService } from '../../../src/order/emission.service';
 import { Order } from '../../../src/order/schemas/order.schema';
-import { OrderRepository } from '../../../src/order/order.repository';
+import { OrderRepository } from '../../../src/order/emission.repository';
 
 describe('BookService', () => {
   let orderService: OrderService;

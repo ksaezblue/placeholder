@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { OrderController } from "../../../src/order/order.controller";
-import { OrderRepository } from "../../../src/order/order.repository";
-import { OrderService } from "../../../src/order/order.service";
+import { OrderController } from "../../../src/order/emission.controller";
+import { OrderRepository } from "../../../src/order/emission.repository";
+import { OrderService } from "../../../src/order/emission.service";
 import { Order } from "../../../src/order/schemas/order.schema";
 
 describe('OrderController', () => {

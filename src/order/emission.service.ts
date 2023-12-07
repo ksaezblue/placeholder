@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { OrderRepository } from './order.repository';
+import { OrderRepository } from './emission.repository';
 import { Order } from 'src/order/schemas/order.schema';
 
 @Injectable()
