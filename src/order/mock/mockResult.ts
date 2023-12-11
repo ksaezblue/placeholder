@@ -94,6 +94,15 @@ export function activate() {
     return stringifiedJson;
 }
 
+export function emission() {
+    let response = {
+        "orderId": 6610670614,
+        "message": "Orden de servicio emitida correctamente"
+    }
+    const stringifiedJson = stringifyJSON(response);    
+    return stringifiedJson;
+}
+
 function stringifyJSON(obj: any) {
     try {
         const jsonString = JSON.stringify(obj, null, 2);
@@ -102,12 +111,6 @@ function stringifyJSON(obj: any) {
         console.error('Error al convertir a JSON:', error.message);
         return null;
     }
-}
-  
-    
-export function emission() {
-        
-    return "sas"
 }
 
 

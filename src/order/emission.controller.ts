@@ -1,6 +1,7 @@
-import { Controller, Get, HttpException, HttpStatus, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, HttpStatus, Param, Post } from '@nestjs/common';
 import { OrderService } from './emission.service';
 import { activate, emission } from './mock/mockResult';
+import { CreateEmissionDto } from './create-emission.dto';
 
 @Controller('orders')
 export class OrderController {
@@ -13,7 +14,7 @@ export class OrderController {
     }
 
     @Post('/emission')
-    async generateNewOrder( orderId: string) {
+    async generateNewOrder(@Body() createEmissionDto: CreateEmissionDto) {
         const response = emission()
 
     return { result: response };
